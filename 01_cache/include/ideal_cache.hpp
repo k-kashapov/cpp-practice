@@ -1,16 +1,21 @@
 #ifndef IDEAL_CACHE_H
 #define IDEAL_CACHE_H
 
-#include <vector>
-#include <queue>
-#include <map>
-#include <iostream>
 #include "cache.hpp"
+#include <iostream>
+#include <map>
+#include <queue>
+#include <vector>
 
 #ifdef DEBUG
-#define debug(x) do { x; } while(0) 
+#define debug(x)                                                               \
+    do {                                                                       \
+        x;                                                                     \
+    } while (0)
 #else
-#define debug(x) do {} while(0) 
+#define debug(x)                                                               \
+    do {                                                                       \
+    } while (0)
 #endif // DEBUG
 
 #ifdef DEBUG
@@ -35,16 +40,17 @@ void print_vec(std::vector<int> &v) {
 #endif // DEBUG
 
 class IdealCache : Cache_I {
-private:
+  private:
     size_t len_ = 0;
     std::vector<int> data_;
-    
+
     std::map<int, std::queue<size_t>> predictions_;
     size_t future_idx_ = 0;
     std::vector<int> future_;
 
-public:
-    IdealCache(int length, std::vector<int> future) : data_(length, -1), future_(future) {
+  public:
+    IdealCache(int length, std::vector<int> future)
+        : data_(length, -1), future_(future) {
         predictions_ = std::map<int, std::queue<size_t>>();
         for (size_t i = 0; i < future_.size(); i++) {
             predictions_[future_[i]].push(i);
@@ -55,27 +61,26 @@ public:
             for (auto pred : predictions_) {
                 int val = pred.first;
                 std::cout << val << " at [";
-                
+
                 print_queue(pred.second);
 
                 std::cout << "\b\b]" << std::endl;
-            }
-            std::cout << std::endl;
+            } std::cout << std::endl;
         );
     }
 
     bool AddElem(int elem) {
         future_idx_++;
 
-        if (len_ < data_.size()) {
-            data_[len_++] = elem;
-            return true;
-        }
-
         for (int our : data_) {
             if (our == elem) {
-                return false;
+                return true;
             }
+        }
+
+        if (len_ < data_.size()) {
+            data_[len_++] = elem;
+            return false;
         }
 
         size_t to_evict = 0;
@@ -83,13 +88,14 @@ public:
 
         for (size_t idx = 0; idx < data_.size(); idx++) {
             std::queue<size_t> &positions = predictions_[data_[idx]];
-            
+
             // Remove all indexes that are in the past
             while (!positions.empty() && (positions.front() < future_idx_)) {
                 positions.pop();
             }
 
-            // If this element will not be encountered anymore, it has to be evicted
+            // If this element will not be encountered anymore, it has to be
+            // evicted
             if (positions.empty()) {
                 to_evict = idx;
                 break;
@@ -102,20 +108,18 @@ public:
             }
         }
 
-        debug(std::cout << "evicted element " << to_evict << " with value " << data_[to_evict] << std::endl);
-        
+        debug(std::cout << "evicted element " << to_evict << " with value "
+                        << data_[to_evict] << std::endl);
+
         data_[to_evict] = elem;
 
-        debug(
-            std::cout << "cache = ";
-            print_vec(data_)
-        );
+        debug(std::cout << "cache = "; print_vec(data_));
 
-        return true;
+        return false;
     }
 
     int FetchElem(int elem) {
-        (void) elem;
+        (void)elem;
         return 0;
     }
 };
