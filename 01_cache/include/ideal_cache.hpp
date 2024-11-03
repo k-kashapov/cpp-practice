@@ -1,57 +1,26 @@
 #ifndef IDEAL_CACHE_H
 #define IDEAL_CACHE_H
 
-#include "cache.hpp"
 #include <iostream>
 #include <map>
 #include <queue>
 #include <vector>
-
-#ifdef DEBUG
-#define debug(x)                                                               \
-    do {                                                                       \
-        x;                                                                     \
-    } while (0)
-#else
-#define debug(x)                                                               \
-    do {                                                                       \
-    } while (0)
-#endif // DEBUG
-
-#ifdef DEBUG
-void print_queue(std::queue<size_t> &q) {
-    size_t len = q.size();
-    for (size_t i = 0; i < len; i++) {
-        int tmp = q.front();
-        q.pop();
-        std::cout << tmp << ", ";
-        q.push(tmp);
-    }
-}
-
-void print_vec(std::vector<int> &v) {
-    std::cout << "[";
-    for (size_t i = 0; i < v.size(); i++) {
-        std::cout << v[i] << ", ";
-    }
-    std::cout << "\b\b]\n";
-}
-
-#endif // DEBUG
+#include <algorithm>
+#include "debug.hpp"
+#include "cache.hpp"
 
 class IdealCache : Cache_I {
   private:
-    size_t len_ = 0;
+    size_t len_;
     std::vector<int> data_;
 
     std::map<int, std::queue<size_t>> predictions_;
-    size_t future_idx_ = 0;
+    size_t future_idx_;
     std::vector<int> future_;
 
   public:
-    IdealCache(int length, std::vector<int> future)
-        : data_(length, -1), future_(future) {
-        predictions_ = std::map<int, std::queue<size_t>>();
+    IdealCache(size_t length, std::vector<int> future)
+    : len_(length), data_(), predictions_(), future_idx_(0), future_(future) {
         for (size_t i = 0; i < future_.size(); i++) {
             predictions_[future_[i]].push(i);
         }
@@ -60,26 +29,40 @@ class IdealCache : Cache_I {
             std::cout << "initialized map with:\n";
             for (auto pred : predictions_) {
                 int val = pred.first;
-                std::cout << val << " at [";
-
+                std::cout << val << " predictions = ";
                 print_queue(pred.second);
-
-                std::cout << "\b\b]" << std::endl;
             } std::cout << std::endl;
         );
     }
 
-    bool AddElem(int elem) {
+    bool AddElem(int elem) override {
         future_idx_++;
 
-        for (int our : data_) {
-            if (our == elem) {
-                return true;
-            }
+        debug(std::cout << "ideal cache process elem " << elem << std::endl);
+
+        auto found = std::find(data_.begin(), data_.end(), elem);
+        if (found != data_.end()) {
+            debug(std::cout << "HIT elem " << elem << std::endl);
+            return true;
         }
 
-        if (len_ < data_.size()) {
-            data_[len_++] = elem;
+        debug(std::cout << "future idx = " << future_idx_ << std::endl);
+
+        if (predictions_[elem].empty() || (predictions_[elem].back() < future_idx_)) {
+            // Do not cache as this element will not be encountered anymore
+            debug(
+                std::cout << "will not encounter " << elem << " anymore, do not cache" << std::endl;
+            );
+            return false;
+        }
+
+        debug(
+            std::cout << "predictions[" << elem << "] = ";
+            print_queue(predictions_[elem]);
+        );
+
+        if (data_.size() < len_) {
+            data_.push_back(elem);
             return false;
         }
 
@@ -118,7 +101,7 @@ class IdealCache : Cache_I {
         return false;
     }
 
-    int FetchElem(int elem) {
+    int FetchElem(int elem) override {
         (void)elem;
         return 0;
     }

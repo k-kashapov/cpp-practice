@@ -3,12 +3,6 @@
 #include <ideal_cache.hpp>
 #include <arc_cache.hpp>
 
-#ifdef DEBUG
-#define debug(x) do { x; } while(0) 
-#else
-#define debug(x) do {} while(0) 
-#endif // DEBUG
-
 int main() {
     int cache_size = 0;
     int elem_num = 0;
@@ -30,10 +24,8 @@ int main() {
 
     std::vector<int> elements(elem_num);
 
-    int elem = 0;
     for (int i = 0; i < elem_num; i++) {
-        std::cin >> elem;
-        elements[i] = elem;
+        std::cin >> elements[i];
     }
 
     for (int i = 0; i < elem_num; i++) {
@@ -47,24 +39,18 @@ int main() {
     int hits = 0;
 
     for (int i = 0; i < elem_num; i++) {
-        bool hit = ideal.AddElem(elements[i]);
-        if (hit) {
-            hits++;
-        }
+        hits += ideal.AddElem(elements[i]);
     }
 
     debug(std::cout << "ideal hits = ");
-
     std::cout << hits << std::endl;
+    debug(std::cout << std::endl);
 
     ARCCache arc(cache_size);
 
     hits = 0;
     for (int i = 0; i < elem_num; i++) {
-        bool hit = arc.AddElem(elements[i]);
-        if (hit) {
-            hits++;
-        }
+        hits += arc.AddElem(elements[i]);
     }
 
     debug(std::cout << "arc hits = ");

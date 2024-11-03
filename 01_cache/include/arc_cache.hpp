@@ -1,37 +1,27 @@
 #ifndef ARC_CAHCE_H
 #define ARC_CAHCE_H
 
-#include "cache.hpp"
 #include <list>
 #include <iostream>
 #include <algorithm>
+#include "cache.hpp"
+#include "debug.hpp"
 
-#ifdef DEBUG
-#define debug(x)                                                               \
-    do {                                                                       \
-        x;                                                                     \
-    } while (0)
-#else
-#define debug(x)                                                               \
-    do {                                                                       \
-    } while (0)
-#endif // DEBUG
-
-using std::size_t;
 class ARCCache : Cache_I {
+using size_t = std::size_t;
   private:
     std::list<int> t1_;
     std::list<int> t2_;
     std::list<int> b1_;
     std::list<int> b2_;
-    int c_;
-    int p_ = 0;
+    size_t c_;
+    size_t p_;
 
     std::list<int>::iterator find(std::list<int>& where, int elem) {
         return std::find(where.begin(), where.end(), elem);
     }
 
-    void replace(int xt, int p) {
+    void replace(int xt, size_t p) {
         auto found = find(b2_, xt);
 
         if ((!t1_.empty()) && ( (t1_.size() > p) || ( (found != b2_.end()) && (t1_.size() == p) ) )) {
@@ -42,16 +32,20 @@ class ARCCache : Cache_I {
     }
 
     bool case_hit(int elem) {
-        auto found = find(t1_, elem);
-        if (found == t1_.end()) {
-            found = find(t2_, elem);
-        }
-
-        if (found != t2_.end()) {
+        auto found1 = find(t1_, elem);
+        if (found1 != t1_.end()) {
             // CACHE HIT
             // => move element to MRU (begin) in t2
-            t2_.splice(t2_.begin(), t2_, found);
+            t2_.splice(t2_.begin(), t1_, found1);
             return true;
+        } else {
+            auto found2 = find(t2_, elem);
+            if (found2 != t2_.end()) {
+                // CACHE HIT
+                // => move element to MRU (begin) in t2
+                t2_.splice(t2_.begin(), t2_, found2);
+                return true;
+            }
         }
 
         return false;
@@ -61,7 +55,7 @@ class ARCCache : Cache_I {
         auto found = find(b1_, elem);
         if (found != b1_.end()) {
             // CASE 2 from paper
-            int delta = b1_.size() > b2_.size() ? 1 : b2_.size() / b1_.size();
+            size_t delta = b1_.size() > b2_.size() ? 1 : b2_.size() / b1_.size();
             p_ = std::min(p_ + delta, c_);
             replace(elem, p_);
             t2_.splice(t2_.begin(), t2_, found);
@@ -76,7 +70,7 @@ class ARCCache : Cache_I {
         if (found != b2_.end()) {
             // CASE 3 from paper
             int delta = b2_.size() > b1_.size() ? 1 : b1_.size() / b2_.size();
-            p_ = std::max(p_ - delta, 0);
+            p_ = std::max((int)p_ - delta, 0);
             replace(elem, p_);
             t2_.splice(t2_.begin(), t2_, found);
             return true;
@@ -86,15 +80,12 @@ class ARCCache : Cache_I {
     }
 
   public:
-    ARCCache(int c) : t1_(), t2_(), b1_(), b2_(), c_(c)
+    ARCCache(int c) : t1_(), t2_(), b1_(), b2_(), c_(c), p_(0)
     {}
 
-    ~ARCCache()
-    {}
-
-    bool AddElem(int elem) {
+    bool AddElem(int elem) override {
         if (case_hit(elem)) {
-            debug(std::cout << "HIT" << std::endl);
+            debug(std::cout << "ARC HIT elem = " << elem << std::endl);
             return true;
         }
 
@@ -106,17 +97,20 @@ class ARCCache : Cache_I {
         // CASE IV
         if (b1_.size() + t1_.size() == c_) {
             // CASE A
-            debug(std::cout << "case A" << std::endl);
+            debug(std::cout << "case A: b1 size = " << b1_.size() 
+                            << ", t1 size = " << t1_.size() 
+                            << ", c_ = " << c_ << std::endl);
             if (t1_.size() < c_) {
                 b1_.pop_back();
                 replace(elem, p_);
             } else {
+                debug(std::cout << "t1 back = " << t1_.back() << std::endl);
                 t1_.pop_back();
             }
         } else {
             // CASE B
             debug(std::cout << "case B" << std::endl);
-            int sum_size = (t1_.size() + t2_.size() + b1_.size() + b2_.size());
+            size_t sum_size = (t1_.size() + t2_.size() + b1_.size() + b2_.size());
             if (sum_size >= c_) {
                 if (sum_size == 2 * c_) {
                     b2_.pop_back();
@@ -133,7 +127,7 @@ class ARCCache : Cache_I {
         return false;
     }
 
-    int FetchElem(int elem) {
+    int FetchElem(int elem) override {
         (void)elem;
         return 0;
     }

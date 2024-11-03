@@ -4,10 +4,11 @@
 #include <vector>
 
 class Cache_I {
-  public:
+public:
     // Returns true if cache hit occured
     virtual bool AddElem(int elem) = 0;
     virtual int FetchElem(int key) = 0;
+    virtual ~Cache_I() {};
 };
 
 #endif // CACHE_H
