@@ -20,5 +20,5 @@ This will build 2 executables:
 
 ## Usage
 
-To run google tests, simply use `run_tests` or use `make test` target.
-To run interactive mode, run compiled binary `NAME_OF_PROJECT` or use `make run` target.
+* To run google tests, simply use `run_tests` or use `make test` target.
+* To run interactive mode, run compiled binary `NAME_OF_PROJECT` or use `make run` target.
