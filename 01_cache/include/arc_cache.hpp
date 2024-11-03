@@ -58,7 +58,7 @@ using size_t = std::size_t;
             size_t delta = b1_.size() > b2_.size() ? 1 : b2_.size() / b1_.size();
             p_ = std::min(p_ + delta, c_);
             replace(elem, p_);
-            t2_.splice(t2_.begin(), t2_, found);
+            t2_.splice(t2_.begin(), b1_, found);
             return true;
         }
 
@@ -72,7 +72,7 @@ using size_t = std::size_t;
             int delta = b2_.size() > b1_.size() ? 1 : b1_.size() / b2_.size();
             p_ = std::max((int)p_ - delta, 0);
             replace(elem, p_);
-            t2_.splice(t2_.begin(), t2_, found);
+            t2_.splice(t2_.begin(), b2_, found);
             return true;
         }
 

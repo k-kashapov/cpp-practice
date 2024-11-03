@@ -63,14 +63,14 @@ TEST(CacheTest, Hard) {
 
     ASSERT_EQ(ideal_hits, 12);
 
-    ARCCache arc{2};
+    ARCCache arc{10};
     size_t arc_hits = 0;
 
     for (int elem : elements) {
         arc_hits += arc.AddElem(elem);
     }
 
-    ASSERT_EQ(arc_hits, 2);
+    ASSERT_EQ(arc_hits, 12);
 }
 
 TEST(CacheTest, Hard1) {
@@ -84,14 +84,14 @@ TEST(CacheTest, Hard1) {
 
     ASSERT_EQ(ideal_hits, 7);
 
-    ARCCache arc{2};
+    ARCCache arc{10};
     size_t arc_hits = 0;
 
     for (int elem : elements) {
         arc_hits += arc.AddElem(elem);
     }
 
-    ASSERT_EQ(arc_hits, 2);
+    ASSERT_EQ(arc_hits, 7);
 }
 
 TEST(CacheTest, Hard2) {
@@ -105,14 +105,14 @@ TEST(CacheTest, Hard2) {
 
     ASSERT_EQ(ideal_hits, 7);
 
-    ARCCache arc{2};
+    ARCCache arc{10};
     size_t arc_hits = 0;
 
     for (int elem : elements) {
         arc_hits += arc.AddElem(elem);
     }
 
-    ASSERT_EQ(arc_hits, 2);
+    ASSERT_EQ(arc_hits, 7);
 }
 
 TEST(CacheTest, Hard3) {
@@ -126,12 +126,12 @@ TEST(CacheTest, Hard3) {
 
     ASSERT_EQ(ideal_hits, 7);
 
-    ARCCache arc{2};
+    ARCCache arc{10};
     size_t arc_hits = 0;
 
     for (int elem : elements) {
         arc_hits += arc.AddElem(elem);
     }
 
-    ASSERT_EQ(arc_hits, 2);
+    ASSERT_EQ(arc_hits, 7);
 }
