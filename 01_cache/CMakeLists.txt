@@ -3,7 +3,7 @@ project(arc_cache)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O3 -ffast-math -gdwarf-4 -msse -msse2 -mfpmath=sse -march=native")
 
 set(HEADERS_ARC include/cache.hpp include/arc_cache.hpp)
 set(SOURCES_ARC src/main_arc.cpp src/arc_cache.cpp ${HEADERS_ARC})
