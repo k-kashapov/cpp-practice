@@ -1,16 +1,16 @@
 #ifndef IDEAL_CACHE_H
 #define IDEAL_CACHE_H
 
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <queue>
 #include <vector>
-#include <algorithm>
-#include "debug.hpp"
 #include "cache.hpp"
+#include "debug.hpp"
 
-class IdealCache : Cache_I {
-  private:
+class IdealCache final : public Cache_I {
+   private:
     size_t len_;
     std::vector<int> data_;
 
@@ -18,9 +18,14 @@ class IdealCache : Cache_I {
     size_t future_idx_;
     std::vector<int> future_;
 
-  public:
-    IdealCache(size_t length, std::vector<int> future)
-    : len_(length), data_(), predictions_(), future_idx_(0), future_(future) {
+   public:
+    IdealCache(size_t length, slow_get_page_t get_page, std::vector<int> future)
+        : Cache_I(get_page),
+          len_(length),
+          data_(),
+          predictions_(),
+          future_idx_(0),
+          future_(future) {
         for (size_t i = 0; i < future_.size(); i++) {
             predictions_[future_[i]].push(i);
         }
@@ -31,16 +36,14 @@ class IdealCache : Cache_I {
                 int val = pred.first;
                 std::cout << val << " predictions = ";
                 print_queue(pred.second);
-            } std::cout << std::endl;
+            }
+            std::cout << std::endl;
         );
     }
 
-    bool AddElem(int elem) override;
+    bool LookupUpdate(int elem) override;
 
-    int FetchElem(int elem) override {
-        (void)elem;
-        return 0;
-    }
+    int FetchElem([[maybe_unused]] int elem) override { return get_page_(elem); }
 };
 
-#endif // IDEAL_CACHE_H
+#endif  // IDEAL_CACHE_H

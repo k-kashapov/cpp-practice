@@ -1,7 +1,11 @@
+#include <debug.hpp>
+#include <ideal_cache.hpp>
 #include <iostream>
 #include <vector>
-#include <ideal_cache.hpp>
-#include <debug.hpp>
+
+int slow_get_page(int key) {
+    return key;
+}
 
 int main() {
     int cache_size = 0;
@@ -28,19 +32,17 @@ int main() {
         std::cin >> elements[i];
     }
 
-    debug(
-    for (int i = 0; i < elem_num; i++) {
-        std::cout << elements[i] << ' ';
-    }
+    debug(for (int i = 0; i < elem_num; i++) { std::cout << elements[i] << ' '; }
 
-    std::cout << std::endl;);
+              std::cout
+              << std::endl;);
 
-    IdealCache ideal(cache_size, elements);
+    IdealCache ideal(cache_size, slow_get_page, elements);
 
     int hits = 0;
 
     for (int elem : elements) {
-        hits += ideal.AddElem(elem);
+        hits += ideal.LookupUpdate(elem);
     }
 
     debug(std::cout << "ideal hits = ");

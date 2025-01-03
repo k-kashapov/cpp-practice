@@ -1,7 +1,11 @@
-#include <iostream>
-#include <vector>
 #include <arc_cache.hpp>
 #include <debug.hpp>
+#include <iostream>
+#include <vector>
+
+int slow_get_page(int key) {
+    return key;
+}
 
 int main() {
     int cache_size = 0;
@@ -26,19 +30,21 @@ int main() {
 
     for (int i = 0; i < elem_num; i++) {
         std::cin >> elements[i];
+
+        if (std::cin.fail()) {
+            std::cout << "ERROR: invalid element\n";
+            return -1;
+        }
     }
 
-    debug(
-    for (int i = 0; i < elem_num; i++) {
-            std::cout << elements[i] << ' ';
-    }
-    std::cout << std::endl;);
+    debug(for (int i = 0; i < elem_num; i++) { std::cout << elements[i] << ' '; } std::cout
+              << std::endl;);
 
-    ARCCache arc(cache_size);
+    ARCCache arc(cache_size, slow_get_page);
 
     int hits = 0;
     for (int elem : elements) {
-        hits += arc.AddElem(elem);
+        hits += arc.LookupUpdate(elem);
     }
 
     debug(std::cout << "arc hits = ");

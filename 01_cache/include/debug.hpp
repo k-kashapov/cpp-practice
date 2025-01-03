@@ -3,12 +3,14 @@
 
 #ifdef DEBUG
 
-#define debug(x)                                                               \
-    do {                                                                       \
-        x;                                                                     \
+#include <queue>
+
+#define debug(x) \
+    do {         \
+        x;       \
     } while (0)
 
-inline void print_queue(std::queue<size_t> &q) {
+inline void print_queue(std::queue<size_t>& q) {
     size_t len = q.size();
     std::cout << "[";
     for (size_t i = 0; i < len; i++) {
@@ -20,7 +22,7 @@ inline void print_queue(std::queue<size_t> &q) {
     std::cout << "\b\b]\n";
 }
 
-inline void print_vec(std::vector<int> &v) {
+inline void print_vec(std::vector<int>& v) {
     std::cout << "[";
     for (int elem : v) {
         std::cout << elem << ", ";
@@ -28,15 +30,15 @@ inline void print_vec(std::vector<int> &v) {
     std::cout << "\b\b]\n";
 }
 
-#else // !DEBUG
+#else  // !DEBUG
 
-#define debug(x)                                                               \
-    do {                                                                       \
+#define debug(x) \
+    do {         \
     } while (0)
 
 #define print_queue(x) debug(x)
 #define print_vec(x) debug(x)
 
-#endif // DEBUG
+#endif  // DEBUG
 
-#endif // DEBUG_H
+#endif  // DEBUG_H
